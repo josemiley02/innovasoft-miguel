@@ -118,6 +118,7 @@ function ClientForm() {
             nombre: clientData.nombre || '',
             apellidos: clientData.apellidos || '',
             identificacion: clientData.identificacion || '',
+            telefonoCelular: clientData.telefonoCelular || '',
             Celular: clientData.telefonoCelular || '',
             telefonoOtros: clientData.telefonoOtros || '',
             direccion: clientData.direccion || '',
