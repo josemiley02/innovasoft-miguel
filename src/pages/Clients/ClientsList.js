@@ -121,6 +121,31 @@ function ClientsList() {
   const [deleting, setDeleting] = useState(false);
   const history = useHistory();
 
+  useEffect(() => {
+    const handleSearch = async (e) => {
+      if (e) e.preventDefault();
+      try {
+        setLoading(true);
+        setError("");
+        const data = await searchClients({
+          identificacion: identifier,
+          nombre: name,
+          usuarioId: user.id,
+        });
+        setClients(data || []);
+      } catch (error) {
+        setError("Error al buscar clientes. Inténtelo de nuevo.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      handleSearch();
+    }
+  }, [user, identifier, name]);
+
   const handleSearch = async (e) => {
     if (e) e.preventDefault();
     try {
@@ -140,12 +165,6 @@ function ClientsList() {
     }
   };
 
-  useEffect(() => {
-    if (user?.id) {
-      handleSearch();
-    }
-  }, [user]);
-
   const handleDeleteClick = (client) => {
     setClientToDelete(client);
     setDeleteDialogOpen(true);
@@ -159,7 +178,9 @@ function ClientsList() {
       setSuccess("Cliente eliminado exitosamente");
       setDeleteDialogOpen(false);
       setClientToDelete(null);
-      await handleSearch();
+      // Refetch clients after deletion
+      setIdentifier("");
+      setName("");
     } catch (err) {
       setError(err.response?.data?.message || "Error al eliminar el cliente. Inténtelo de nuevo.");
       console.error(err);
