@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import Layout from "../../components/Layout";
+import NotFoundClients from "./NotFoundClients";
 import {
   TextField,
   Button,
@@ -117,6 +118,7 @@ function ClientsList() {
   const [loading, setLoading] = useState(true);
   const [clients, setClients] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [clientToDelete, setClientToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const history = useHistory();
@@ -151,6 +153,7 @@ function ClientsList() {
     try {
       setLoading(true);
       setError("");
+      setHasSearched(true);
       const data = await searchClients({
         identificacion: identifier,
         nombre: name,
@@ -287,6 +290,8 @@ function ClientsList() {
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
             <CircularProgress style={{ color: "#FF9900" }} />
           </Box>
+        ) : hasSearched && clients.length === 0 ? (
+          <NotFoundClients />
         ) : clients.length === 0 ? (
           <Paper className={classes.noResults}>
             <Typography variant="h6">No hay clientes para mostrar</Typography>

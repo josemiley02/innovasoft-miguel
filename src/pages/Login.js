@@ -108,6 +108,7 @@ function Login(){
         
         try{
             setLoading(true);
+            console.log("Estoy enviando al Login %s y %s", [username, password])
             const data = await loginRequest(username, password);
             login(data);
             if (remember){

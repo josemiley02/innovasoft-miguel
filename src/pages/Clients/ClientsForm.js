@@ -118,7 +118,7 @@ function ClientForm() {
             nombre: clientData.nombre || '',
             apellidos: clientData.apellidos || '',
             identificacion: clientData.identificacion || '',
-            telefonoCelular: clientData.telefonoCelular || '',
+            Celular: clientData.telefonoCelular || '',
             telefonoOtros: clientData.telefonoOtros || '',
             direccion: clientData.direccion || '',
             fechaNacimiento: clientData.fechaNacimiento ? clientData.fechaNacimiento.split('T')[0] : '',
@@ -145,35 +145,74 @@ function ClientForm() {
   const validateForm = () => {
     const newErrors = {};
 
+    // Nombre: string, máximo 50
     if (!client.nombre?.trim()) {
       newErrors.nombre = 'El nombre es requerido';
+    } else if (client.nombre.trim().length > 50) {
+      newErrors.nombre = 'El nombre no puede exceder 50 caracteres';
     }
+
+    // Apellidos: string, máximo 100
     if (!client.apellidos?.trim()) {
       newErrors.apellidos = 'Los apellidos son requeridos';
+    } else if (client.apellidos.trim().length > 100) {
+      newErrors.apellidos = 'Los apellidos no pueden exceder 100 caracteres';
     }
+
+    // Identificación: string, máximo 20
     if (!client.identificacion?.trim()) {
       newErrors.identificacion = 'La identificación es requerida';
+    } else if (client.identificacion.trim().length > 20) {
+      newErrors.identificacion = 'La identificación no puede exceder 20 caracteres';
     }
+
+    // Teléfono Celular: string, máximo 20
     if (!client.telefonoCelular?.trim()) {
       newErrors.telefonoCelular = 'El teléfono celular es requerido';
+    } else if (client.telefonoCelular.trim().length > 20) {
+      newErrors.telefonoCelular = 'El teléfono celular no puede exceder 20 caracteres';
     }
+
+    // Otro Teléfono: string, máximo 20
+    if (!client.telefonoOtros?.trim()){
+      newErrors.telefonoOtros = 'El otro telefono de contacto es requerido';
+    }
+    if (client.telefonoOtros && client.telefonoOtros.trim().length > 20) {
+      newErrors.telefonoOtros = 'El teléfono no puede exceder 20 caracteres';
+    }
+
+    // Dirección: string, máximo 200
     if (!client.direccion?.trim()) {
       newErrors.direccion = 'La dirección es requerida';
+    } else if (client.direccion.trim().length > 200) {
+      newErrors.direccion = 'La dirección no puede exceder 200 caracteres';
     }
+
+    // Fecha de Nacimiento: requerida
     if (!client.fechaNacimiento?.trim()) {
       newErrors.fechaNacimiento = 'La fecha de nacimiento es requerida';
     }
+
+    // Fecha de Afiliación: requerida
     if (!client.fechaAfiliacion?.trim()) {
       newErrors.fechaAfiliacion = 'La fecha de afiliación es requerida';
     }
+
+    // Sexo: string, máximo 1, requerido
     if (!client.sexo?.trim()) {
       newErrors.sexo = 'El sexo es requerido';
     }
-    if (!client.intereses?.trim()) {
-      newErrors.intereses = 'Debe seleccionar al menos un interés';
-    }
+
+    // Reseña Personal: string, máximo 200
     if (!client.resena?.trim()) {
       newErrors.resena = 'La reseña personal es requerida';
+    } else if (client.resena.trim().length > 200) {
+      newErrors.resena = 'La reseña personal no puede exceder 200 caracteres';
+    }
+
+    // Intereses: requerido
+    if (!client.intereses?.trim()) {
+      newErrors.intereses = 'Debe seleccionar al menos un interés';
     }
 
     setErrors(newErrors);
@@ -209,16 +248,15 @@ function ClientForm() {
       setError('Por favor complete todos los campos requeridos');
       return;
     }
-
     try {
       setSubmitting(true);
       setError('');
-
+      
       const dataToSend = {
         nombre: client.nombre,
         apellidos: client.apellidos,
         identificacion: client.identificacion,
-        telefonoCelular: client.telefonoCelular,
+        Celular: client.telefonoCelular,
         otroTelefono: client.telefonoOtros || '',
         direccion: client.direccion,
         fNacimiento: client.fechaNacimiento,
@@ -226,9 +264,12 @@ function ClientForm() {
         sexo: client.sexo,
         resenaPersonal: client.resena,
         imagen: client.imagen,
-        interesesFK: client.intereses,
+        interesFK: client.intereses,
         usuarioId: client.usuarioId,
       };
+
+      console.log('Datos enviados al API:', dataToSend);
+      console.log('Tamaño de imagen (caracteres):', dataToSend.imagen ? dataToSend.imagen.length : 0);
 
       if (isEdit) {
         dataToSend.id = id;
@@ -243,8 +284,10 @@ function ClientForm() {
         history.push('/clientes');
       }, 1500);
     } catch (err) {
+      console.error('Error completo:', err);
+      console.error('Response data:', err.response?.data);
+      console.error('Response status:', err.response?.status);
       setError(err.response?.data?.message || 'Error al guardar el cliente. Inténtelo de nuevo.');
-      console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -283,8 +326,9 @@ function ClientForm() {
                       value={client.nombre}
                       onChange={(e) => handleChange('nombre', e.target.value)}
                       error={!!errors.nombre}
-                      helperText={errors.nombre}
+                      helperText={errors.nombre || `${client.nombre.length}/50`}
                       variant="outlined"
+                      inputProps={{ maxLength: 50 }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -294,8 +338,9 @@ function ClientForm() {
                       value={client.apellidos}
                       onChange={(e) => handleChange('apellidos', e.target.value)}
                       error={!!errors.apellidos}
-                      helperText={errors.apellidos}
+                      helperText={errors.apellidos || `${client.apellidos.length}/100`}
                       variant="outlined"
+                      inputProps={{ maxLength: 100 }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -305,8 +350,9 @@ function ClientForm() {
                       value={client.identificacion}
                       onChange={(e) => handleChange('identificacion', e.target.value)}
                       error={!!errors.identificacion}
-                      helperText={errors.identificacion}
+                      helperText={errors.identificacion || `${client.identificacion.length}/20`}
                       variant="outlined"
+                      inputProps={{ maxLength: 20 }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -366,8 +412,9 @@ function ClientForm() {
                       value={client.telefonoCelular}
                       onChange={(e) => handleChange('telefonoCelular', e.target.value)}
                       error={!!errors.telefonoCelular}
-                      helperText={errors.telefonoCelular}
+                      helperText={errors.telefonoCelular || `${client.telefonoCelular.length}/20`}
                       variant="outlined"
+                      inputProps={{ maxLength: 20 }}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -376,7 +423,10 @@ function ClientForm() {
                       label="Teléfono Otros"
                       value={client.telefonoOtros}
                       onChange={(e) => handleChange('telefonoOtros', e.target.value)}
+                      error={!!errors.telefonoOtros}
+                      helperText={errors.telefonoOtros || `${client.telefonoOtros.length}/20`}
                       variant="outlined"
+                      inputProps={{ maxLength: 20 }}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -386,8 +436,9 @@ function ClientForm() {
                       value={client.direccion}
                       onChange={(e) => handleChange('direccion', e.target.value)}
                       error={!!errors.direccion}
-                      helperText={errors.direccion}
+                      helperText={errors.direccion || `${client.direccion.length}/200`}
                       variant="outlined"
+                      inputProps={{ maxLength: 200 }}
                     />
                   </Grid>
                 </Grid>
@@ -422,7 +473,7 @@ function ClientForm() {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Box>
-                      <Typography variant="body2" style={{ marginBottom: '8px' }}>
+                      <Typography variant="body2" style={{ marginBottom: '8px', color: errors.imagen ? '#d32f2f' : '#1a1a1a' }}>
                         Imagen del Cliente*
                       </Typography>
                       <input
@@ -431,6 +482,11 @@ function ClientForm() {
                         onChange={handleImageChange}
                         style={{ display: 'block', marginBottom: '8px' }}
                       />
+                      {errors.imagen && (
+                        <Typography variant="body2" style={{ color: '#d32f2f', fontSize: '0.75rem', marginTop: '4px' }}>
+                          {errors.imagen}
+                        </Typography>
+                      )}
                       {client.imagenPreview && (
                         <img 
                           src={client.imagenPreview} 
@@ -449,8 +505,9 @@ function ClientForm() {
                       value={client.resena}
                       onChange={(e) => handleChange('resena', e.target.value)}
                       error={!!errors.resena}
-                      helperText={errors.resena}
+                      helperText={errors.resena || `${client.resena.length}/200`}
                       variant="outlined"
+                      inputProps={{ maxLength: 200 }}
                     />
                   </Grid>
                 </Grid>
